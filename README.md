@@ -37,6 +37,7 @@ This project is currently in the **planning and documentation phase**. No source
 - **Caching**: Upstash Redis for slot computation caching
 - **Background Jobs**: QStash or Supabase Edge Functions
 - **Rate Limiting**: Upstash Rate Limit
+- **Monitoring**: Sentry for error tracking, performance monitoring, and structured logging
 
 ## 📱 Application Features
 
@@ -69,6 +70,7 @@ This project is currently in the **planning and documentation phase**. No source
 - **`identity.md`** - Development guidelines and coding standards
   - React/Next.js/TypeScript best practices
   - Code style guidelines (early returns, Tailwind-first, accessibility)
+  - Test-Driven Development (TDD) workflow and testing guidelines
   - Component architecture patterns
 
 - **`vision.md`** - Product vision and strategy
@@ -104,7 +106,11 @@ This project is currently in the **planning and documentation phase**. No source
 - **Authorization**: Row Level Security (RLS) with role-based access
 - **Performance**: Optimized with Redis caching and proper database indexing
 - **Reliability**: Automated backups and point-in-time recovery
-- **Testing**: Concurrency tests to prevent double-bookings
+- **Testing**:
+  - Test-Driven Development (TDD) with Jest framework
+  - Unit, integration, and end-to-end testing
+  - Visual regression testing with Puppeteer
+  - Concurrency tests to prevent double-bookings
 
 ## 🚦 Getting Started
 
@@ -113,6 +119,11 @@ This project is currently in the **planning and documentation phase**. No source
 3. **Screen Specifications**: Study `/mind/screens.md` for UI requirements
 4. **Development Guidelines**: Follow `/mind/identity.md` for code standards
 5. **Setup Development**: Initialize Next.js project with specified tech stack
+6. **Configure Monitoring**: Setup Sentry using `npx @sentry/wizard@latest -i nextjs --saas --org base-61 --project javascript-nextjs`
+
+### Development Resources
+- **Sentry Guidelines**: See `/mind/sentry.md` for error tracking implementation patterns
+- **Project Configuration**: Complete setup instructions in `CLAUDE.md`
 
 ## 📄 License
 
