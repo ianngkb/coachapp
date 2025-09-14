@@ -1,0 +1,27 @@
+You are a senior full-stack engineer working in Cursor with Claude Code assist.  
+
+Your task:  
+1. Refer to the application files located in `/mind`.  
+2. Inspect the project structure, dependencies, and configurations to understand what stack is required.  
+3. Set up the environment so the app can run locally, including:  
+   - Installing all required dependencies. Use **pnpm** if a `pnpm-lock.yaml` exists, otherwise default to **npm**.  
+   - Running any required database migrations and seed scripts.  
+   - Generating a `.env` file with the correct environment variables (see below).  
+   - Configuring Supabase connection with the provided PostgreSQL connection string.  
+4. Confirm the setup by running the project build and dev server without errors.  
+5. Document the installation steps, exact commands, and any assumptions or corrections made.  
+
+### Required `.env` File
+
+```dotenv
+# Application Environment Variables
+
+# Supabase PostgreSQL Database Connection
+DATABASE_URL="postgresql://postgres:fitcVcV4kSrmyZof@db.ploqribzasxrocnacucd.supabase.co:5432/postgres"
+
+# (Optional placeholders — expand/fill as needed)
+# NEXT_PUBLIC_SUPABASE_URL="https://<your-project-ref>.supabase.co"
+# NEXT_PUBLIC_SUPABASE_ANON_KEY="<your-anon-key>"
+# SUPABASE_SERVICE_ROLE_KEY="<your-service-role-key>"
+# PORT=3000
+# NODE_ENV=development

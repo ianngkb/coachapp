@@ -16,35 +16,9 @@ This document provides comprehensive documentation of all 12 screens in the Coac
 
 ## Authentication Flow Screens
 
-### 1. Welcome Screen
-**State:** `welcome`  
-**Component:** `WelcomeScreen.tsx`  
-**Access:** Public (unauthenticated users)
-
-#### Purpose
-First-time user onboarding screen that introduces the CoachConnect platform and its value proposition.
-
-#### Key Functions
-- **Brand Introduction**: Displays app logo, name, and value proposition
-- **Feature Highlights**: Shows key benefits (instant booking, verified coaches, secure auth)
-- **Entry Point**: Single CTA to continue to sign-in process
-- **Visual Appeal**: Clean welcome experience with consistent black/white branding
-
-#### User Flow
-```
-Welcome Screen → Continue → Sign In Screen
-```
-
-#### Screen Elements
-- App branding and logo
-- Value proposition messaging
-- Feature benefit list with checkmarks
-- Primary "Continue" button
-- Clean card-based layout
-
 ---
 
-### 2. Sign In Screen
+### 1. Sign In Screen
 **State:** `signin`  
 **Component:** `SignInScreen.tsx`  
 **Access:** Public (unauthenticated users)
@@ -82,7 +56,7 @@ Sign In Screen → Email Not Found → Sign Up Option → Sign Up Screen
 
 ---
 
-### 3. Sign Up Screen
+### 2. Sign Up Screen
 **State:** `signup`  
 **Component:** `SignUpScreen.tsx`  
 **Access:** Public (unauthenticated users)
@@ -161,7 +135,7 @@ Email Sent Screen → Auto Demo Login (3s) → User Dashboard
 
 ## Core Application Screens
 
-### 5. Coach Directory (Home/Browse)
+### 5. Coach Directory (Homepage/Browse)
 **State:** `directory`  
 **Component:** `CoachDirectory.tsx`  
 **Access:** Public and authenticated users
@@ -535,7 +509,7 @@ Coach Services → Back → Coach Dashboard
 
 ### Authentication Flow
 ```
-Welcome → Sign In → Email Sent → Dashboard/Directory
+Sign In → Email Sent → Dashboard/Directory
          ↓
       Sign Up → Email Sent → Dashboard/Directory
 ```

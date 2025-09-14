@@ -1,134 +1,36 @@
-# CoachConnect - Coach Booking Marketplace
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A mobile-first scheduling platform that empowers coaches to easily share their availability and manage lessons, while giving students a simple way to discover, book, and manage coaching sessions — all in one place.
+## Getting Started
 
-## 🎯 Vision Statement
+First, run the development server:
 
-**"The Calendly for Coaches"** - Unlike general-purpose scheduling tools, this app is built specifically for coaching with a public coach directory as its centerpiece, focusing on discovery, booking, and coaching workflows.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## 🚀 Project Status
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-This project is currently in the **planning and documentation phase**. No source code has been implemented yet. The `/mind` directory contains comprehensive specifications that serve as the foundation for development.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 📋 Core Value Proposition
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-### For Coaches
-- Professional profile in a central directory
-- Easy tools to set availability and prevent double booking
-- Visibility to new students they might never reach otherwise
+## Learn More
 
-### For Students
-- Browse a directory of available coaches
-- See up-to-date availability (in GMT+8)
-- Book instantly — no back-and-forth
+To learn more about Next.js, take a look at the following resources:
 
-## 🏗️ Technical Architecture
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-### Frontend Stack
-- **Framework**: Next.js (App Router) + React 18
-- **Styling**: Tailwind CSS v4 with custom design tokens
-- **UI Components**: Complete shadcn/ui component library
-- **State Management**: TanStack Query (server state) + Zustand (local state)
-- **Authentication**: Magic link (passwordless) via Supabase Auth
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### Backend Stack
-- **Database**: Supabase Postgres (Singapore region)
-- **API**: Next.js API routes with Zod validation
-- **Caching**: Upstash Redis for slot computation caching
-- **Background Jobs**: QStash or Supabase Edge Functions
-- **Rate Limiting**: Upstash Rate Limit
-- **Monitoring**: Sentry for error tracking, performance monitoring, and structured logging
+## Deploy on Vercel
 
-## 📱 Application Features
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-### Core MVP Features
-1. **Coach Directory** - Searchable and filterable list of coaches
-2. **Coach Profiles** - Bio, services offered, availability, and booking button
-3. **Availability Management** - Weekly schedules, exceptions, and time off
-4. **Booking Flow** - Select service, pick a slot, confirm booking
-5. **User Dashboards** - Role-specific interfaces for students and coaches
-
-### Advanced Features (Post-MVP)
-- Google Calendar integration with bi-directional sync
-- Review and rating system
-- Email notifications and reminders
-- Payment processing integration
-- Group sessions and workshops
-
-## 🎨 Design Principles
-
-- **Mobile-first**: Optimized for one-thumb booking on the go
-- **Simple by design**: Focus on availability and scheduling excellence
-- **Coach-centric directory**: Discovery is a first-class feature
-- **Consistent timezone**: All times in GMT+8 (Malaysian market focus)
-- **Scalable foundation**: Built for future expansion
-
-## 🗂️ Documentation Structure
-
-### `/mind` Directory Contents
-
-- **`identity.md`** - Development guidelines and coding standards
-  - React/Next.js/TypeScript best practices
-  - Code style guidelines (early returns, Tailwind-first, accessibility)
-  - Test-Driven Development (TDD) workflow and testing guidelines
-  - Component architecture patterns
-
-- **`vision.md`** - Product vision and strategy
-  - Problem definition for coaches and students
-  - Market opportunity and competitive positioning
-  - Success criteria and long-term roadmap
-
-- **`tech.md`** - Complete technical specifications
-  - Detailed frontend and backend architecture
-  - Database design and security considerations
-  - Performance optimization strategies
-  - Component library and state management patterns
-
-- **`screens.md`** - Application screens and user flows
-  - All 12 primary screens with detailed specifications
-  - Authentication flow and navigation patterns
-  - User experience and interaction design
-
-### `/design` Directory
-- Homepage design specifications and visual references
-
-## 🌏 Market Focus
-
-**Primary Market**: Malaysia (Kuala Lumpur & Selangor)
-- Malaysian Ringgit (RM) currency formatting
-- GMT+8 timezone consistency
-- Local phone number validation
-- Court location preferences
-
-## 🔒 Security & Performance
-
-- **Authentication**: Magic link with email verification
-- **Authorization**: Row Level Security (RLS) with role-based access
-- **Performance**: Optimized with Redis caching and proper database indexing
-- **Reliability**: Automated backups and point-in-time recovery
-- **Testing**:
-  - Test-Driven Development (TDD) with Jest framework
-  - Unit, integration, and end-to-end testing
-  - Visual regression testing with Puppeteer
-  - Concurrency tests to prevent double-bookings
-
-## 🚦 Getting Started
-
-1. **Review Documentation**: Start with `/mind/vision.md` for product understanding
-2. **Technical Architecture**: Read `/mind/tech.md` for implementation details
-3. **Screen Specifications**: Study `/mind/screens.md` for UI requirements
-4. **Development Guidelines**: Follow `/mind/identity.md` for code standards
-5. **Setup Development**: Initialize Next.js project with specified tech stack
-6. **Configure Monitoring**: Setup Sentry using `npx @sentry/wizard@latest -i nextjs --saas --org base-61 --project javascript-nextjs`
-
-### Development Resources
-- **Sentry Guidelines**: See `/mind/sentry.md` for error tracking implementation patterns
-- **Project Configuration**: Complete setup instructions in `CLAUDE.md`
-
-## 📄 License
-
-This project is proprietary. All rights reserved.
-
----
-
-*This README is generated from comprehensive planning documents in the `/mind` directory. For detailed technical specifications, user flows, and implementation guidelines, please refer to the individual documentation files.*
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

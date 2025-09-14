@@ -9,7 +9,18 @@
       "WebSearch",
       "mcp__puppeteer__puppeteer_navigate",
       "mcp__puppeteer__puppeteer_screenshot",
-      "mcp__puppeteer__puppeteer_evaluate"
+      "mcp__puppeteer__puppeteer_evaluate",
+      "Bash(mkdir:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(timeout 15 npm run dev)",
+      "Bash(cat:*)",
+      "Bash(npm run dev:*)",
+      "mcp__puppeteer__puppeteer_click",
+      "mcp__puppeteer__puppeteer_fill",
+      "Bash(taskkill:*)",
+      "Bash(copy:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
