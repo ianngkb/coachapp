@@ -20,9 +20,17 @@
       "mcp__puppeteer__puppeteer_fill",
       "Bash(taskkill:*)",
       "Bash(copy:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(timeout:*)",
+      "Bash(set SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsb3FyaWJ6YXN4cm9jbmFjdWNkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Nzc1MzYzNywiZXhwIjoyMDczMzI5NjM3fQ.zWC9CEFRd-8oR8srUXm5Tf0gxLDjXlAneAu_k5rG2hw)",
+      "Bash(pkill:*)",
+      "Bash(cd:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "outputStyle": "default"
 }

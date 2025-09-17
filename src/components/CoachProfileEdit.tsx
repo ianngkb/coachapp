@@ -1,12 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { CoachHeader } from './CoachHeader'
+import { supabase, type City } from '@/lib/supabase'
+import { generateUserAvatar, getAvatarUrl } from '@/lib/avatar'
+import { getCurrentUser } from '@/lib/auth'
 import {
   Camera,
   Save,
@@ -14,24 +17,32 @@ import {
   MapPin,
   ChevronDown,
   CheckSquare,
-  FileText
+  FileText,
+  AlertCircle
 } from 'lucide-react'
 
 export default function CoachProfileEdit() {
   const router = useRouter()
-  const [selectedSports, setSelectedSports] = useState(['Tennis'])
-  const [selectedCourts, setSelectedCourts] = useState(['Base Pickle and Padel', 'KLCC Tennis Centre'])
+  const [selectedSports, setSelectedSports] = useState<string[]>([])
+  const [selectedCourts, setSelectedCourts] = useState<string[]>([])
+  const [availableCities, setAvailableCities] = useState<City[]>([])
+  const [avatarUrl, setAvatarUrl] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [userData, setUserData] = useState<any>(null)
+  const [coachData, setCoachData] = useState<any>(null)
   const [formData, setFormData] = useState({
-    name: 'Sarah Chen',
-    email: 'sarah.chen@example.com',
-    phone: '+60 12-345 6789',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
     location: 'Kuala Lumpur',
-    city: 'Kuala Lumpur City Centre',
-    yearsExperience: '8',
-    certifications: 'ITT Level 2, Fitness Training Certified',
-    languages: 'English, Mandarin',
-    specialties: 'Technique, Strategy, Fitness',
-    bio: 'Professional tennis coach with over 8 years of experience. Specialized in technique improvement and match strategy for players of all levels.'
+    city: '',
+    yearsExperience: '',
+    certifications: '',
+    languages: '',
+    specialties: '',
+    bio: ''
   })
 
   const sportsOptions = [
@@ -62,8 +73,150 @@ export default function CoachProfileEdit() {
     )
   }
 
+  // Load cities based on selected state
+  const loadCities = async (state: string) => {
+    try {
+      const { data: cities, error } = await supabase
+        .from('cities')
+        .select('*')
+        .eq('state', state)
+        .order('is_popular', { ascending: false })
+        .order('display_order', { ascending: true })
+
+      if (error) {
+        console.error('Error loading cities from database:', error)
+        setAvailableCities([])
+        return
+      }
+
+      setAvailableCities(cities || [])
+    } catch (err) {
+      console.error('Error loading cities:', err)
+      setAvailableCities([])
+    }
+  }
+
+  // Load user data when component mounts
+  useEffect(() => {
+    loadUserData()
+  }, [])
+
+  // Load cities when location changes
+  useEffect(() => {
+    if (formData.location) {
+      loadCities(formData.location)
+    }
+  }, [formData.location])
+
+  const loadUserData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Get current authenticated user
+      const user = await getCurrentUser()
+      if (!user) {
+        setError('Please sign in to edit your profile')
+        return
+      }
+
+      // Check if user is a coach
+      if (user.user_type !== 'coach') {
+        setError('Only coaches can access this page')
+        return
+      }
+
+      // Get full user data from users table
+      const { data: userInfo, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (userError) {
+        console.error('Error fetching user data:', userError)
+        setError('Failed to load user data')
+        return
+      }
+
+      // Get coach profile data
+      const { data: coachInfo, error: coachError } = await supabase
+        .from('coach_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      if (coachError) {
+        console.error('Error fetching coach data:', coachError)
+        // Create coach profile if it doesn't exist
+        const { data: newCoach, error: createError } = await supabase
+          .from('coach_profiles')
+          .insert({
+            user_id: user.id,
+            bio: 'Welcome to my coaching profile!',
+            years_experience: 0,
+            certifications: [],
+            specializations: [],
+            languages_spoken: ['English'],
+            is_available: true,
+            listing_status: 'active'
+          })
+          .select()
+          .single()
+
+        if (createError) {
+          console.error('Error creating coach profile:', createError)
+          setError('Failed to create coach profile')
+          return
+        }
+        setCoachData(newCoach)
+      } else {
+        setCoachData(coachInfo)
+      }
+
+      setUserData(userInfo)
+
+      // Populate form data with real user data
+      setFormData({
+        firstName: userInfo.first_name || '',
+        lastName: userInfo.last_name || '',
+        email: userInfo.email || '',
+        phone: userInfo.phone_number || '',
+        location: userInfo.location_state || 'Kuala Lumpur',
+        city: userInfo.location_city || '',
+        yearsExperience: coachInfo?.years_experience?.toString() || '0',
+        certifications: Array.isArray(coachInfo?.certifications)
+          ? coachInfo.certifications.join(', ')
+          : coachInfo?.certifications || '',
+        languages: Array.isArray(coachInfo?.languages_spoken)
+          ? coachInfo.languages_spoken.join(', ')
+          : coachInfo?.languages_spoken || 'English',
+        specialties: Array.isArray(coachInfo?.specializations)
+          ? coachInfo.specializations.join(', ')
+          : coachInfo?.specializations || '',
+        bio: coachInfo?.bio || ''
+      })
+
+      // Generate avatar for the user
+      const defaultAvatar = getAvatarUrl(userInfo.profile_image_url, user.id, user.email, 128)
+      setAvatarUrl(defaultAvatar)
+
+    } catch (err: any) {
+      console.error('Error loading user data:', err)
+      setError(err.message || 'Failed to load profile data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+
+    // When state changes, reset city and load new cities
+    if (field === 'location') {
+      setFormData(prev => ({ ...prev, [field]: value, city: '' }))
+      loadCities(value)
+    }
   }
 
   const handleSaveChanges = () => {
@@ -72,6 +225,52 @@ export default function CoachProfileEdit() {
 
   const handleBack = () => {
     router.push('/coach-profile')
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <CoachHeader
+          title="My Profile"
+          subtitle="Edit your coaching profile"
+          showBackButton={true}
+          backHref="/coach-dashboard"
+        />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-lg p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your profile...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <CoachHeader
+          title="My Profile"
+          subtitle="Edit your coaching profile"
+          showBackButton={true}
+          backHref="/coach-dashboard"
+        />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-lg p-8 text-center">
+            <div className="text-red-500 mb-4">
+              <AlertCircle className="h-8 w-8 mx-auto" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Profile</h3>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={loadUserData} variant="outline">
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -96,12 +295,25 @@ export default function CoachProfileEdit() {
             Profile Photo
           </h2>
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-              <img
-                src="/api/placeholder/80/80"
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-gray-200">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile Avatar"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback if avatar fails to load
+                    const target = e.target as HTMLImageElement
+                    target.src = generateUserAvatar('fallback-user', formData.email, 128)
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+                  <span className="text-lg font-semibold">
+                    {formData.firstName.charAt(0)}{formData.lastName.charAt(0)}
+                  </span>
+                </div>
+              )}
             </div>
             <div>
               <Button variant="outline" className="mb-2">
@@ -109,6 +321,7 @@ export default function CoachProfileEdit() {
                 Change Photo
               </Button>
               <p className="text-sm text-gray-600">Upload a professional photo (max 5MB)</p>
+              <p className="text-xs text-gray-500 mt-1">Currently using auto-generated avatar</p>
             </div>
           </div>
         </div>
@@ -117,14 +330,27 @@ export default function CoachProfileEdit() {
         <div className="bg-gray-50 rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                className="mt-1"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  className="mt-1"
+                  placeholder="Enter your first name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  className="mt-1"
+                  placeholder="Enter your last name"
+                />
+              </div>
             </div>
 
             <div>
@@ -143,21 +369,30 @@ export default function CoachProfileEdit() {
                 <Phone className="h-4 w-4" />
                 Phone Number
               </Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder="+60 XX-XXX XXXX"
-                className="mt-1"
-              />
-              <p className="text-xs text-gray-500 mt-1">Malaysian phone numbers only</p>
+              <div className="relative mt-1">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                  +60
+                </div>
+                <Input
+                  id="phone"
+                  value={formData.phone.replace('+60 ', '').replace('+60', '')}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^\d-\s]/g, '');
+                    handleInputChange('phone', '+60 ' + value);
+                  }}
+                  placeholder="12-345 6789"
+                  className="pl-12"
+                  maxLength={12}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Malaysian phone numbers only (e.g., +60 12-345 6789)</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Location
+                  State
                 </Label>
                 <div className="relative mt-1">
                   <select
@@ -166,10 +401,8 @@ export default function CoachProfileEdit() {
                     onChange={(e) => handleInputChange('location', e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md bg-white appearance-none pr-8"
                   >
-                    <option>Kuala Lumpur</option>
-                    <option>Selangor</option>
-                    <option>Penang</option>
-                    <option>Johor</option>
+                    <option value="Kuala Lumpur">Kuala Lumpur</option>
+                    <option value="Selangor">Selangor</option>
                   </select>
                   <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                 </div>
@@ -183,14 +416,27 @@ export default function CoachProfileEdit() {
                     value={formData.city}
                     onChange={(e) => handleInputChange('city', e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md bg-white appearance-none pr-8"
+                    disabled={!formData.location}
                   >
-                    <option>Kuala Lumpur City Centre</option>
-                    <option>Bangsar</option>
-                    <option>Mont Kiara</option>
-                    <option>Damansara</option>
+                    <option value="">
+                      {formData.location ? 'Select a city' : 'Select state first'}
+                    </option>
+                    {availableCities.map((city) => (
+                      <option key={city.id} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
                   </select>
                   <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                 </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {availableCities.length > 0
+                    ? `${availableCities.length} cities available in ${formData.location}`
+                    : formData.location
+                      ? 'Loading cities...'
+                      : 'Select a state to see available cities'
+                  }
+                </p>
               </div>
             </div>
           </div>
@@ -341,7 +587,7 @@ export default function CoachProfileEdit() {
                 />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-lg">{formData.name}</h3>
+                <h3 className="font-semibold text-lg">{formData.firstName} {formData.lastName}</h3>
                 <p className="text-sm text-gray-600 mb-2">{formData.city}, {formData.location}</p>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {selectedSports.slice(0, 2).map((sport) => (
